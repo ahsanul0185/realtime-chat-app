@@ -6,7 +6,11 @@ const router = express.Router();
 router.post("/signup", signup);
 
 router.get("/login", (req, res) => {
-    res.send("Login endpoint")
+    try {
+        
+    } catch (error) {
+        
+    }
 })
 
 router.get("/logout", (req, res) => {
