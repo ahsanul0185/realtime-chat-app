@@ -28,7 +28,7 @@ const SignupPage = () => {
 
 
             {/* FORM CLOUMN - LEFT SIDE */}
-            <div className="md:w-1/2 p-8 flex items-center justify-center md:border-r border-slate-600/30">
+            <div className="md:w-1/2 p-8 flex items-center justify-center md:border-r border-r-gray-200/15">
               <div className="w-full max-w-md">
                 {/* HEADING TEXT */}
                 <div className="text-center mb-8">
@@ -119,7 +119,7 @@ const SignupPage = () => {
 
 
             {/* FORM ILLUSTRATION - RIGHT SIDE */}
-            <div className="hidden md:w-1/2 md:flex items-center justify-center p-6 bg-linear-to-bl from-slate-800/20 to-transparent">
+            <div className="hidden md:w-1/2 md:flex items-center justify-center p-6">
               <div>
                 <img
                   src={ChattingIllustration}
