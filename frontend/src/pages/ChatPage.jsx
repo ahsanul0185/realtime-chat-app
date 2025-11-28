@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react'
 import { useAuthStore } from '../store/useAuthStore'
 import { useChatStore } from '../store/useChatStore';
-import BorderAnimatedContainer from '../components/BorderAnimatedContainer';
 import ProfileHeader from '../components/ProfileHeader';
 import ActiveTabSwitch from '../components/ActiveTabSwitch';
 import ContactList from '../components/ContactList';
@@ -10,17 +9,12 @@ import ChatContainer from '../components/ChatContainer';
 import NoConversation from '../components/NoConversation';
 
 const ChatPage = () => {
-
-  const {logout} = useAuthStore();
-  const {getAllContacts, activeTab, selectedUser} = useChatStore();
-
-  useEffect(() => {
-    getAllContacts()
-  },[])
+  
+  const {activeTab, selectedUser} = useChatStore();
 
   return (
     <div className="relative w-full max-w-6xl flex h-[800px] rounded-2xl border border-gray-200/20 bg-linear-to-br from-slate-900 via-neutral-950 to-black">
-      {/* LEFT SIDE */}
+      {/* SIDEBAR */}
       <div className="w-80 border-r h-full border-r-gray-200/20 flex flex-col">
         <ProfileHeader/>
         <ActiveTabSwitch />

@@ -8,11 +8,13 @@ import messageRoutes from "./routes/message.route.js";
 import { connectDB } from "./lib/db.js";
 import { ENV } from "./lib/env.js";
 
-const app = express();
+const app = express(); 
 const PORT = ENV.PORT || 3000;
 const __dirname = path.resolve();
 
-app.use(express.json());
+app.use(express.json({ limit: "2mb" }));
+app.use(express.urlencoded({ extended: true, limit: "2mb" }));
+
 app.use(cookieParser());
 app.use(cors({origin : ENV.CLIENT_URL, credentials : true}))
 
