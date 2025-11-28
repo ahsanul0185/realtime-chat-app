@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 import ChatHeader from "./ChatHeader";
@@ -11,17 +11,30 @@ const ChatContainer = () => {
   const { selectedUser, getMessagesByUserId, messages, isMessagesLoading } =
     useChatStore();
   const { authUser } = useAuthStore();
+  const messageEndRef = useRef(null);
 
   useEffect(() => {
     getMessagesByUserId(selectedUser._id);
   }, [selectedUser, getMessagesByUserId]);
 
+  useEffect(() => {
+    if (messageEndRef.current) {
+      messageEndRef.current.scrollIntoView()
+    }
+  }, []);
+
+  useEffect(() => {
+    if (messageEndRef.current) {
+      messageEndRef.current.scrollIntoView({behavior : "smooth"})
+    }
+  }, [messages]);
+
   return (
     <>
       <ChatHeader />
-      <div className="flex-1 px-6 overflow-y-auto py-8">
+      <div className="flex-1 px-6 overflow-y-auto py-8 custom-scrollbar">
         {messages.length > 0 && !isMessagesLoading ? (
-          <div className="space-y-2 text-sm ">
+          <div className="space-y-4 text-sm ">
             {messages.map((msg) => (
               <div
                 key={msg._id}
@@ -29,23 +42,36 @@ const ChatContainer = () => {
                   authUser._id === msg.senderId
                     ? "justify-end"
                     : "justify-start"
-                }`}
+                } ${(msg.text &&  msg.image && authUser._id === msg.senderId) ? "flex-col gap-2 items-end" : (msg.text &&  msg.image) ? "flex-col gap-2 items-start" : ""}`}
               >
-                <div
-                  className={`flex items-end gap-2.5 px-4 py-2 rounded-full max-w-1/2 w-fit ${
+                {msg.text && <div
+                  className={`flex items-end gap-2.5 px-4 py-2 rounded-3xl max-w-1/2 w-fit ${
                     authUser._id === msg.senderId
                       ? "bg-gray-600/50"
                       : "border border-gray-200/40"
-                  }`}
+                  } `}
                 >
+
                   <span>{msg.text}</span>
 
                   <span className={`text-[10px] text-gray-400 `}>
                     {formatChatTime(msg.createdAt)}
                   </span>
-                </div>
+                </div>}
+
+                {msg.image && <div
+                  className={`flex  flex-col gap-2 rounded-3xl max-w-1/2 w-fit ${authUser._id === msg.senderId ? "items-end" : "items-start"}`}
+                >
+            
+                    <img src={msg.image} alt="Shared" className="rounded-lg h-48 object-cover" />
+
+                  <span className={`text-[10px] text-gray-400 `}>
+                    {formatChatTime(msg.createdAt)}
+                  </span>
+                </div>}
               </div>
             ))}
+            <div ref={messageEndRef}/>
           </div>
         ) : isMessagesLoading ? (
           ""
