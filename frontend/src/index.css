@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary : var(--color-amber-400);
+  --color-dark : #0d1320;
+}
+
+
 @property --border-angle {
   inherits: false;
   initial-value: 0deg;
