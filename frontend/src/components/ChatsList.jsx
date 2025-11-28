@@ -41,7 +41,7 @@ const ChatsList = () => {
             </div>
             <div className="w-full flex justify-between">
               <div>
-                <h4 className="text-slate-200 font-medium truncate">
+                <h4 className="text-slate-200 truncate">
               {chat.fullName}
             </h4>
             <p className="text-xs text-gray-300">{authUser._id === chat.lastMessage.senderId ? "You: " : ""}{chat.lastMessage.text}</p>

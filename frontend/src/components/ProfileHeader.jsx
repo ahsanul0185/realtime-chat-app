@@ -63,7 +63,7 @@ const ProfileHeader = () => {
 
           <div className="flex items-center justify-between w-full">
             <div>
-              <h3 className="text-slate-200 font-medium text-sm max-w-[180px] truncate">
+              <h3 className="text-slate-200 text-sm max-w-[180px] truncate">
                 {authUser.fullName}
               </h3>
 
