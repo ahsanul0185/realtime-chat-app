@@ -33,6 +33,29 @@ io.on("connection", (socket) => {
   // io.emit() is used to send events to all connected clients
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
+
+  // Handle typing events
+  socket.on("userTyping", ({ receiverId }) => {
+    const receiverSocketId = getRecieverSocketId(receiverId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("userTyping", {
+        senderId: userId,
+        isTyping: true,
+      });
+    }
+  })
+
+
+  socket.on("userStoppedTyping", ({ receiverId }) => {
+    const receiverSocketId = getRecieverSocketId(receiverId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("userStoppedTyping", {
+        senderId: userId,
+        isTyping: false,
+      });
+    }
+  });
+
   socket.on("disconnect", () => {
     console.log("An user disconnected", socket.user.fullName);
     delete userSocketMap[userId];

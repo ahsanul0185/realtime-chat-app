@@ -5,7 +5,7 @@ import { XIcon } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 
 const ChatHeader = () => {
-  const { selectedUser, setSelectedUser } = useChatStore();
+  const { selectedUser, setSelectedUser, typingUsers } = useChatStore();
   const {onlineUsers} = useAuthStore();
 
   useEffect(() => {
@@ -16,6 +16,7 @@ const ChatHeader = () => {
     return () => window.removeEventListener("keydown", handleEscKey)
   }, [setSelectedUser])
   
+const isSelectedUserTyping = selectedUser && typingUsers ? typingUsers[selectedUser._id] : false;
 
   return (
     <div className="flex justify-between items-center border-b border-b-gray-200/20 max-h-[84px] px-6 flex-1">
@@ -38,7 +39,10 @@ const ChatHeader = () => {
               {selectedUser.fullName}
             </h3>
 
-            <p className="text-slate-400 text-[11px]">
+            {/* <p className="text-slate-400 text-[11px]">
+              {onlineUsers.includes(selectedUser._id) && isSelectedUserTyping ? <span>Typing...</span> : onlineUsers.includes(selectedUser._id) ? "Online" : "Offline"}
+            </p> */}
+                        <p className="text-slate-400 text-[11px]">
               {onlineUsers.includes(selectedUser._id) ? "Online" : "Offline"}
             </p>
           </div>

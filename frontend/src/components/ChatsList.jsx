@@ -7,7 +7,7 @@ import noAvatar from "../assets/no-profile.svg"
 import { formatChatTime } from "../lib/formatChatTime";
 
 const ChatsList = () => {
-  const { getAllChatPartners, chats, isUsersLoading, setSelectedUser } =
+  const { getAllChatPartners, chats, isUsersLoading, setSelectedUser, selectedUser, typingUsers} =
     useChatStore();
   const {authUser, onlineUsers} = useAuthStore();
 
@@ -18,7 +18,7 @@ const ChatsList = () => {
   if (isUsersLoading) return <UsersLoadingSkeleton />;
 
   if (chats.length === 0) return <NoChatsFound />;
-
+  const isSelectedUserTyping = selectedUser && typingUsers ? typingUsers[selectedUser._id] : false;
   return (
     <>
       {chats.map((chat) => (
@@ -44,7 +44,7 @@ const ChatsList = () => {
                 <h4 className="text-slate-200 truncate">
               {chat.fullName}
             </h4>
-            <p className="text-xs text-gray-300">{authUser._id === chat.lastMessage.senderId ? "You: " : ""}{chat.lastMessage.text}</p>
+            {isSelectedUserTyping ? <p className="text-xs text-gray-300 italic">Typing...</p> : <p className="text-xs text-gray-300">{authUser._id === chat.lastMessage.senderId ? "You: " : ""}{chat.lastMessage.text}</p>}
               </div>
 
               <span className="text-xs text-gray-400">{formatChatTime(chat.lastMessage.createdAt)}</span>

@@ -1,24 +1,148 @@
-import React, { useRef, useState } from "react";
+// import React, { useRef, useState } from "react";
+// import useKeyboardSound from "../hooks/useKeyboardSound";
+// import { useChatStore } from "../store/useChatStore";
+// import toast from "react-hot-toast";
+// import { ImageIcon, SendIcon, XIcon } from "lucide-react";
+
+
+// const MessageInput = () => {
+//   const { playRandomKeyStrokeSound } = useKeyboardSound();
+//   const [text, setText] = useState("");
+//   const [imagePreview, setImagePreview] = useState(null);
+
+//   const fileInputRef = useRef(null);
+
+//   const { sendMessage, isSoundEnabled } = useChatStore();
+
+//   const handleSendMessage = (e) => {
+//     e.preventDefault();
+//     if (!text.trim() && !imagePreview) return;
+
+//     if (isSoundEnabled) playRandomKeyStrokeSound();
+
+//     sendMessage({
+//       text: text.trim(),
+//       image: imagePreview,
+//     });
+
+//     setText("");
+//     setImagePreview("");
+
+//     if (fileInputRef.current) fileInputRef.current.value = "";
+//   };
+
+//   const handleImageChange = (e) => {
+//     const file = e.target.files[0];
+//     if (!file.type.startsWith("image/")) {
+//       toast.error("Please select an image file");
+//       return;
+//     }
+
+//     const reader = new FileReader();
+//     reader.onloadend = () => setImagePreview(reader.result);
+//     reader.readAsDataURL(file);
+//   };
+
+//   const removeImage = () => {
+//     setImagePreview(null);
+//     if (fileInputRef.current) fileInputRef.current.value = "";
+//   };
+
+//   return (
+//     <div className="p-4 border-t border-t-gray-200/20">
+//       {imagePreview && (
+//         <div className="max-w-3xl mx-auto mb-3 flex items-center">
+//           <div className="relative">
+//             <img
+//               src={imagePreview}
+//               alt="Preview"
+//               className="w-20 h-20 object-cover rounded-lg border border-gray-700"
+//             />
+//             <button
+//               onClick={removeImage}
+//               className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center cursor-pointer text-slate-200 hover:bg-gray-700"
+//               type="button"
+//             >
+//               <XIcon className="w-4 h-4" />
+//             </button>
+//           </div>
+//         </div>
+//       )}
+
+//       <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto flex space-x-4 text-sm">
+//          <button
+//           type="button"
+//           onClick={() => fileInputRef.current?.click()}
+//           className={`text-gray-400 hover:text-gray-200 cursor-pointer transition-colors ${
+//             imagePreview ? "text-cyan-500" : ""
+//           }`}
+//         >
+//           <ImageIcon className="w-5 h-5" />
+//         </button>
+//         <input type="text" value={text} onChange={e => {setText(e.target.value); isSoundEnabled && playRandomKeyStrokeSound();}} className="flex-1 border border-gray-200/30 rounded-full py-2 px-4 outline-0 focus:border-gray-200/60" placeholder="Type your message..." />
+//         <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} className="hidden"/>
+    
+//       <button
+//           type="submit"
+//           disabled={!text.trim() && !imagePreview}
+//           className="bg-linear-to-r cursor-pointer text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+//         >
+//           <SendIcon className="w-5 h-5" />
+//         </button>
+
+//       </form>
+//     </div>
+//   );
+// };
+
+// export default MessageInput;
+
+
+import React, { useRef, useState, useEffect } from "react";
 import useKeyboardSound from "../hooks/useKeyboardSound";
 import { useChatStore } from "../store/useChatStore";
 import toast from "react-hot-toast";
 import { ImageIcon, SendIcon, XIcon } from "lucide-react";
 
-
 const MessageInput = () => {
   const { playRandomKeyStrokeSound } = useKeyboardSound();
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
+  const [isTyping, setIsTyping] = useState(false);
 
   const fileInputRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
 
-  const { sendMessage, isSoundEnabled } = useChatStore();
+  const { sendMessage, isSoundEnabled, selectedUser, emitTyping, emitStoppedTyping } = useChatStore();
+
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Stop typing when user changes
+  useEffect(() => {
+    if (isTyping && selectedUser) {
+      emitStoppedTyping(selectedUser._id);
+      setIsTyping(false);
+    }
+  }, [selectedUser?._id]);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!text.trim() && !imagePreview) return;
 
     if (isSoundEnabled) playRandomKeyStrokeSound();
+
+    // Stop typing when sending message
+    if (isTyping && selectedUser) {
+      emitStoppedTyping(selectedUser._id);
+      setIsTyping(false);
+    }
 
     sendMessage({
       text: text.trim(),
@@ -29,6 +153,44 @@ const MessageInput = () => {
     setImagePreview("");
 
     if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleTextChange = (e) => {
+    const value = e.target.value;
+    setText(value);
+
+    if (isSoundEnabled) playRandomKeyStrokeSound();
+
+    // Don't emit typing if no user selected
+    if (!selectedUser) return;
+
+    // Handle typing indicator
+    if (value.trim() && !isTyping) {
+      setIsTyping(true);
+      emitTyping(selectedUser._id);
+    }
+
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    // Set new timeout to stop typing after 2 seconds of inactivity
+    typingTimeoutRef.current = setTimeout(() => {
+      if (isTyping) {
+        setIsTyping(false);
+        emitStoppedTyping(selectedUser._id);
+      }
+    }, 10000);
+
+    // If input is empty, immediately stop typing
+    if (!value.trim() && isTyping) {
+      setIsTyping(false);
+      emitStoppedTyping(selectedUser._id);
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    }
   };
 
   const handleImageChange = (e) => {
@@ -69,8 +231,11 @@ const MessageInput = () => {
         </div>
       )}
 
-      <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto flex space-x-4 text-sm">
-         <button
+      <form
+        onSubmit={handleSendMessage}
+        className="max-w-3xl mx-auto flex space-x-4 text-sm"
+      >
+        <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
           className={`text-gray-400 hover:text-gray-200 cursor-pointer transition-colors ${
@@ -79,17 +244,28 @@ const MessageInput = () => {
         >
           <ImageIcon className="w-5 h-5" />
         </button>
-        <input type="text" value={text} onChange={e => {setText(e.target.value); isSoundEnabled && playRandomKeyStrokeSound();}} className="flex-1 border border-gray-200/30 rounded-full py-2 px-4 outline-0 focus:border-gray-200/60" placeholder="Type your message..." />
-        <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} className="hidden"/>
-    
-      <button
+        <input
+          type="text"
+          value={text}
+          onChange={handleTextChange}
+          className="flex-1 border border-gray-200/30 rounded-full py-2 px-4 outline-0 focus:border-gray-200/60"
+          placeholder="Type your message..."
+        />
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          onChange={handleImageChange}
+          className="hidden"
+        />
+
+        <button
           type="submit"
           disabled={!text.trim() && !imagePreview}
           className="bg-linear-to-r cursor-pointer text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <SendIcon className="w-5 h-5" />
         </button>
-
       </form>
     </div>
   );
