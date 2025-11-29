@@ -8,14 +8,19 @@ import MessageInput from "./MessageInput";
 import MessagesLoadingSkelton from "./MessagesLoadingSkelton";
 
 const ChatContainer = () => {
-  const { selectedUser, getMessagesByUserId, messages, isMessagesLoading } =
+  const { selectedUser, getMessagesByUserId, messages, isMessagesLoading, subscribeToMessages, unsubscribeFromMessages } =
     useChatStore();
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
 
   useEffect(() => {
     getMessagesByUserId(selectedUser._id);
-  }, [selectedUser, getMessagesByUserId]);
+    subscribeToMessages()
+
+    // clean up
+
+    return () => unsubscribeFromMessages()
+  }, [selectedUser, getMessagesByUserId, subscribeToMessages, unsubscribeFromMessages]);
 
   useEffect(() => {
     if (messageEndRef.current) {
@@ -28,6 +33,7 @@ const ChatContainer = () => {
       messageEndRef.current.scrollIntoView({behavior : "smooth"})
     }
   }, [messages]);
+
 
   return (
     <>
@@ -45,7 +51,7 @@ const ChatContainer = () => {
                 } ${(msg.text &&  msg.image && authUser._id === msg.senderId) ? "flex-col gap-2 items-end" : (msg.text &&  msg.image) ? "flex-col gap-2 items-start" : ""}`}
               >
                 {msg.text && <div
-                  className={`flex items-end gap-2.5 px-4 py-2 rounded-3xl max-w-1/2 w-fit ${
+                  className={`flex items-end gap-2.5 px-4 py-2 rounded-[20px] max-w-2/3 w-fit ${
                     authUser._id === msg.senderId
                       ? "bg-gray-600/50"
                       : "border border-gray-200/40"
@@ -54,7 +60,7 @@ const ChatContainer = () => {
 
                   <span>{msg.text}</span>
 
-                  <span className={`text-[10px] text-gray-400 `}>
+                  <span className={`text-[10px] text-gray-400 whitespace-nowrap`}>
                     {formatChatTime(msg.createdAt)}
                   </span>
                 </div>}
@@ -85,3 +91,4 @@ const ChatContainer = () => {
 };
 
 export default ChatContainer;
+
