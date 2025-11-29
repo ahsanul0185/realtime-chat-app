@@ -2,9 +2,11 @@ import React, { useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
 import noAvatar from "../assets/no-profile.svg";
 import { XIcon } from "lucide-react";
+import { useAuthStore } from "../store/useAuthStore";
 
 const ChatHeader = () => {
   const { selectedUser, setSelectedUser } = useChatStore();
+  const {onlineUsers} = useAuthStore();
 
   useEffect(() => {
     const handleEscKey = (e) => {
@@ -20,7 +22,8 @@ const ChatHeader = () => {
       <div className="flex justify-between items-center w-full">
         <div className="flex gap-3 items-center">
           <div className="h-10 relative group shrink-0">
-            <span className="z-10 absolute group-hover:opacity-0 group-hover:scale-0 duration-200 -bottom-[0.2px] -right-[3px] border-2 border-dark size-3.5 bg-green-500 rounded-full"></span>
+            <span className={`z-10 absolute -bottom-[0.2px] -right-[3px] border-2 border-dark size-3.5 ${onlineUsers.includes(selectedUser._id) ? "bg-green-500" : "bg-gray-500"}  rounded-full`}></span>
+
             <button className="size-10 rounded-full overflow-hidden relative">
               <img
                 src={selectedUser.profilePic || noAvatar}
@@ -35,7 +38,9 @@ const ChatHeader = () => {
               {selectedUser.fullName}
             </h3>
 
-            <p className="text-slate-400 text-[11px]">Online</p>
+            <p className="text-slate-400 text-[11px]">
+              {onlineUsers.includes(selectedUser._id) ? "Online" : "Offline"}
+            </p>
           </div>
         </div>
 

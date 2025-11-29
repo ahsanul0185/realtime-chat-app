@@ -9,7 +9,7 @@ import { formatChatTime } from "../lib/formatChatTime";
 const ChatsList = () => {
   const { getAllChatPartners, chats, isUsersLoading, setSelectedUser } =
     useChatStore();
-  const {authUser} = useAuthStore();
+  const {authUser, onlineUsers} = useAuthStore();
 
   useEffect(() => {
     getAllChatPartners();
@@ -31,7 +31,7 @@ const ChatsList = () => {
             <div
               className="relative shrink-0"
             >
-            <span className="z-10 absolute bottom-[0.3px] -right-[0.5px] border-2 border-dark size-3.5 bg-green-500 rounded-full"></span>
+            <span className={`z-10 absolute bottom-[0.3px] -right-[0.5px] border-2 border-dark size-3.5 ${onlineUsers.includes(chat._id) ? "bg-green-500" : "bg-gray-500"}  rounded-full`}></span>
               <div className="size-12 rounded-full overflow-hidden">
                 <img
                   src={chat.profilePic || noAvatar}
