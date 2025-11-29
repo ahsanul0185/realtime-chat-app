@@ -19,7 +19,7 @@ const ChatHeader = () => {
 const isSelectedUserTyping = selectedUser && typingUsers ? typingUsers[selectedUser._id] : false;
 
   return (
-    <div className="flex justify-between items-center border-b border-b-gray-200/20 max-h-[64px] md:max-h-[84px] px-6 flex-1">
+    <div className="flex justify-between items-center border-b border-b-gray-200/20 max-h-16 md:max-h-[84px] px-6 flex-1">
       <div className="flex justify-between items-center w-full">
         <div className="flex gap-3 items-center">
           <div className="h-10 relative group shrink-0">

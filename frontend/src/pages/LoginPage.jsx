@@ -23,14 +23,14 @@ const LoginPage = () => {
   
 
   return (
-    <div className="w-full flex items-center justify-center p-4">
-      <div className="relative w-full max-w-6xl md:h-[800px] h-[750px]">
+    <div className="w-full flex items-center justify-center p-2 md:p-4">
+      <div className="relative w-full max-w-6xl md:h-[800px] h-[95vh]">
         <BorderAnimatedContainer className="p-5">
           <div className="w-full h-full flex flex-col md:flex-row">
 
 
             {/* FORM CLOUMN - LEFT SIDE */}
-            <div className="order-2 md:w-1/2 p-8 flex items-center justify-center md:border-l border-l-gray-200/15">
+            <div className="order-2 md:w-1/2 p-1 md:p-8 flex items-center justify-center md:border-l border-l-gray-200/15">
               <div className="w-full max-w-md">
                 {/* HEADING TEXT */}
                 <div className="text-center mb-8">
