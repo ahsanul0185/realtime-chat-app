@@ -15,7 +15,7 @@ const ChatPage = () => {
   return (
 <>
 
-    <div className="hidden relative w-full max-w-6xl md:flex h-[800px] rounded-2xl border border-gray-200/20 bg-linear-to-br from-slate-900 via-neutral-950 to-black">
+    <div className="hidden relative w-full max-w-6xl md:flex h-[800px] rounded-2xl border border-gray-200/20 bg-black">
       {/* SIDEBAR */}
       <div className="w-80 border-r h-full border-r-gray-200/20 flex flex-col">
         <ProfileHeader/>
@@ -33,7 +33,7 @@ const ChatPage = () => {
     </div>
 
 
-        <div className="md:hidden relative w-full flex h-screen bg-linear-to-br from-slate-900 via-neutral-950 to-black">
+        <div className="md:hidden relative w-full flex h-screen bg-black">
 
       {/* RIGHT SIDE */}
       <div className="flex-1 flex flex-col">
